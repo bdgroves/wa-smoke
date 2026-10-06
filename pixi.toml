@@ -1,0 +1,30 @@
+[workspace]
+name = "wa-smoke"
+description = "Washington's 2026 wildfire smoke season over the state's terrain, rendered with forge3d"
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-arm64"]
+
+[dependencies]
+python = "3.12.*"
+numpy = "*"
+scipy = "*"
+rasterio = "*"
+pillow = "*"
+ffmpeg = "*"
+python-eccodes = "*"
+
+[pypi-dependencies]
+forge3d = ">=1.39"
+
+[tasks]
+dem = "python scripts/fetch_dem.py"
+boundary = "python scripts/fetch_boundary.py"
+smoke = "python scripts/fetch_smoke.py"
+fires = "python scripts/fetch_fires.py"
+data = { depends-on = ["dem", "boundary", "smoke", "fires"] }
+preview = { cmd = "python scripts/render.py --preview", depends-on = ["data"] }
+render = { cmd = "python scripts/render.py --export", depends-on = ["data"] }
+render-square = { cmd = "python scripts/render.py --export --format 1x1", depends-on = ["data"] }
+render-portrait = { cmd = "python scripts/render.py --export --format 4x5", depends-on = ["data"] }
+stills = { cmd = "python scripts/render.py --stills 216,456,end", depends-on = ["data"] }
+finish = "python scripts/finish.py"
